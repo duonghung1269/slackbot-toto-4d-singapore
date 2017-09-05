@@ -24,8 +24,8 @@ var bot = controller.spawn({
 controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct_message,direct_mention,ambient',function(bot,message) {
     var text = message.text;
     console.log('Text message===',text, message.channel);
-    bot.reply(message,"Waiting to check TOTO result ... :kissing_closed_eyes:");  
-      
+    bot.replyAndUpdate(message,"Waiting to check TOTO result ... :kissing_closed_eyes:");  
+    console.log("1. Message obj", message)  
     var arr = text.split(" ");
     var keyword = arr[0];
     var drawNumber = arr[1]
@@ -38,9 +38,12 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
   
     singaporePools.getTotoFromServer(request).then(function(res) {
         if (res.statusCode != 200) {
-          bot.reply(message, "Server is busy! Try again!!!")
+          bot.replyAndUpdate(message, "Server is busy! Try again!!!")
           return;
         }
+        
+        console.log("2. Message obj", message)
+      
         var data = res.body;
         var jsonData = JSON.parse(data.d);
         console.log('jsonData===', jsonData)  
@@ -48,13 +51,14 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
         var totoReponse = new TotoModel.TotoResponseModel(jsonData);
       
         if (totoReponse.prizes.length == 0) {
-          bot.reply(message, `You're bad luck!! Try another numbers! :sob: \n${totoReponse.displayWinningNumbers()}`);
+          bot.replyAndUpdate(message, `You're bad luck!! Try another numbers! :sob: \n${totoReponse.displayWinningNumbers()}`);
+          console.log("3. Message obj", message)
           return;
         }
       
         
-        bot.reply(message, "CONGRATULATION!!! You're so lucky man :heart_eyes:");
-        bot.reply(message, totoReponse.displayData());
+        bot.replyAndUpdate(message, "CONGRATULATION!!! You're so lucky man :heart_eyes:");
+        bot.replyAndUpdate(message, totoReponse.displayData());
     });
 });
 
