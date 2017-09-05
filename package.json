@@ -2,9 +2,6 @@
   "name": "toto-4d-singapore",
   "version": "1.0.0",
   "description": "Check Singapore toto, 4d results on slack",
-  "scripts": {    
-      //"start": "node ./node_modules/.bin/pm2 delete -s server; node ./node_modules/.bin/pm2 start server.js"
-  },
   "author": "Henry Dang <duonghung1269>",
   "dependencies": {
     "ws": "^1.1.1",
