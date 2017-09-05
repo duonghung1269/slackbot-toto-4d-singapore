@@ -1,0 +1,1 @@
+node ./node_modules/.bin/pm2 delete -s server && node ./node_modules/.bin/pm2 start server.js && node ./node_modules/.bin/pm2 logs all
