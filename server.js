@@ -5,11 +5,15 @@ if (!process.env.token) {
 
 var Botkit = require('botkit');
 var os = require('os');
+var CronJob = require('cron').CronJob;
 var singaporePools = require('./services/singapore-pools');
 var quote = require('./services/quote');
 var giphy = require('./services/giphy')
 var TotoModel = require('./models/totoModel');
 
+// this cachedMessage to use for job toto live to reply to slack channel
+var cachedMessage = undefined;
+var totoLiveNumbers = [];
 
 var controller = Botkit.slackbot({
     debug: true,
@@ -18,6 +22,74 @@ var controller = Botkit.slackbot({
 var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
+
+var nextDrawNumber = 3299;
+// debug cronTime: '*/10 * * * * *' // every 10 seconds
+// cronTime: '*/5 30-40 18 * * 1,4',
+var totoBroadcastJob = new CronJob({
+  cronTime: '*/5 30-40 18 * * 1,4',
+  onTick: function() {
+    /*
+     * Runs every 5 seconds from 18:30 to 18-40 on Tuesday and Thursday    
+     */
+    
+    // live job
+    singaporePools.getNextDrawNumber(nextDrawNumber).then(function(res) {
+        if (res.statusCode != 200) {
+          bot.replyAndUpdate(cachedMessage, "Server is busy! Let wait!!!")
+          return;
+        }              
+      
+        var jsonData = res.body;         
+        console.log('jsonData===', jsonData)              
+      
+        if (!jsonData) {
+          console.log("==== Undefined getNextDrawNumber response ====");
+          return;
+        }
+      
+        if (nextDrawNumber != jsonData.next_draw_id) {
+          nextDrawNumber = jsonData.next_draw_id;
+        }                
+        
+        // live not started yet
+        if (!jsonData.numbers || jsonData.status == 1) {
+          console.log("Live not started yet");
+          return;
+        }
+      
+        var numberOfDrawedNumbers = jsonData.numbers.length;
+        var totoLiveStoredLength = totoLiveNumbers.length;
+        if (numberOfDrawedNumbers == 1 && totoLiveStoredLength != numberOfDrawedNumbers) {
+          var number = jsonData.numbers[0];
+          totoLiveNumbers.push(number);
+          bot.replyAndUpdate(cachedMessage, `The first draw number is: *${number}*`);            
+          return;
+        } else if (numberOfDrawedNumbers > 1 && numberOfDrawedNumbers < 6 && totoLiveStoredLength != numberOfDrawedNumbers) {
+          var number = jsonData.numbers[numberOfDrawedNumbers - 1];
+          totoLiveNumbers.push(number);
+          bot.replyAndUpdate(cachedMessage, `The next draw number is: *${number}*`);            
+          return;
+        } else if (numberOfDrawedNumbers == 7 && totoLiveStoredLength != numberOfDrawedNumbers) {
+          var number = jsonData.numbers[numberOfDrawedNumbers - 1];
+          bot.replyAndUpdate(cachedMessage, `The *bonus* draw number is: *${jsonData.numbers[number]}*`);  
+          totoLiveNumbers.push(number);
+          return;
+        }
+        
+        bot.replyAndUpdate(cachedMessage, "Thanks for watching Toto live! See you on next Draw!");
+        
+    });
+  }, function () {
+    /* This function is executed when the job stops */
+    // clear stored toto live numbers
+    totoLiveNumbers = [];
+  },
+  start: false,
+  timeZone: 'Asia/Singapore'
+});
+
+totoBroadcastJob.start();
 
 // listen message with format ex: toto 1234 1,2,3,4,5,6
 // syntax has 3 parts, separate by spaces
@@ -59,7 +131,8 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
           return;
         }
       
-        
+        cachedMessage = message;  
+      
         bot.replyAndUpdate(message, "CONGRATULATION!!! You're so lucky man :heart_eyes:");
         bot.replyAndUpdate(message, totoReponse.displayData());
     });
@@ -78,6 +151,8 @@ controller.hears(['[qQ]uote'],'direct_message,direct_mention',function(bot,messa
           return;
         }                      
       
+        cachedMessage = message;
+    
         // var responseMessage = {
         //   "attachments": [
         //     {
@@ -121,6 +196,8 @@ controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot
           return;
         }                      
       
+        cachedMessage = message;
+    
         var responseMessage = {
           "attachments": [
             {
@@ -139,8 +216,10 @@ controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot
 });
 
 controller.hears(['^[hH]elp$'],'direct_message,direct_mention',function(bot,message) {
-    var services = "*Toto checking*\n  ex: toto 1234 1,2,3,4,5,6\n" +
+  cachedMessage = message;  
+  
+  var services = "*Toto checking*\n  ex: toto 1234 1,2,3,4,5,6\n" +
                    "*Quote*\n  ex: quote\n" +
                    "*Gif*\n  ex: gif";
-    bot.reply(message, services)
+    bot.reply(message, services)    
 });

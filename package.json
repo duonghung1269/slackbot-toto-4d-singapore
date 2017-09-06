@@ -6,15 +6,19 @@
   "scripts": {    
     "start": "node server.js"
   },
+  "repository" : { 
+   "type" : "git",
+   "url" : "https://github.com/duonghung1269/slackbot-toto-4d-singapore.git"
+  },  
+  "license" : "MIT",
   "dependencies": {
     "ws": "^1.1.1",
 		"request": "2.72.0",
-    "httpdispatcher":"*",
     "botkit": "*",
     "crawler": "*", 
     "promise": "*",
-    "ajax-request" : "*",
     "pm2" : "*",
-    "pm2-logrotate" : "*"
+    "pm2-logrotate" : "*",
+    "cron" : "*"
   }
 }
