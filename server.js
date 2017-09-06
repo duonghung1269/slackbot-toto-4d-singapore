@@ -6,6 +6,7 @@ if (!process.env.token) {
 var Botkit = require('botkit');
 var os = require('os');
 var singaporePools = require('./singapore-pools');
+var quote = require('./quote');
 var TotoModel = require('./totoModel');
 
 var controller = Botkit.slackbot({
@@ -59,6 +60,39 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
         
         bot.replyAndUpdate(message, "CONGRATULATION!!! You're so lucky man :heart_eyes:");
         bot.replyAndUpdate(message, totoReponse.displayData());
+    });
+});
+
+controller.hears(['quote'],'direct_message,direct_mention',function(bot,message) {
+    bot.reply(message, "Finding your interesting quote...");
+    
+  quote.getRandomQuote().then(function(res) {
+        if (res.statusCode != 200) {
+          bot.replyAndUpdate(message, "Quote Server is busy! Try again!!!")
+          return;
+        }
+            
+        var data = res.body;
+        var jsonData = JSON.parse(data);
+        console.log('Quote ===', jsonData)  
+      
+        var responseMessage = {
+          "attachments": [
+            {
+              "fallback": jsonData.quoteText,
+              "color": "#36a64f",
+              "pretext": "Is this your favorite quote?",
+              "author_name": jsonData.quoteAuthor,
+              "author_link": jsonData.quoteLink,              
+              "title": "Quote",
+              "title_link": jsonData.quoteLink,
+              "text": jsonData.quoteText,              
+              "ts": 123456789
+            }
+          ]
+        }
+    
+        bot.replyAndUpdate(message, responseMessage);        
     });
 });
 
