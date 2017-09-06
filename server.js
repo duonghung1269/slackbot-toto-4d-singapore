@@ -63,17 +63,18 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
     });
 });
 
+// Reply random Quote
 controller.hears(['quote'],'direct_message,direct_mention',function(bot,message) {
     bot.reply(message, "Finding your interesting quote...");
     
   quote.getRandomQuote().then(function(res) {
-        if (res.statusCode != 200) {
-          bot.replyAndUpdate(message, "Quote Server is busy! Try again!!!")
-          return;
-        }
-                
         var jsonData = res.body;
         console.log('Quote ===', jsonData)  
+    
+        if (res.statusCode != 200 || !jsonData) {
+          bot.replyAndUpdate(message, "Quote Server is busy! Try again!!!")
+          return;
+        }                      
       
         // var responseMessage = {
         //   "attachments": [
