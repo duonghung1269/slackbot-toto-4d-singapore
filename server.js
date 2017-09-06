@@ -71,23 +71,34 @@ controller.hears(['quote'],'direct_message,direct_mention',function(bot,message)
           bot.replyAndUpdate(message, "Quote Server is busy! Try again!!!")
           return;
         }
-            
-        var data = res.body;
-        var jsonData = JSON.parse(data);
+                
+        var jsonData = res.body;
         console.log('Quote ===', jsonData)  
       
+        // var responseMessage = {
+        //   "attachments": [
+        //     {
+        //       "fallback": jsonData.quoteText,
+        //       "color": "#36a64f",
+        //       "pretext": "Is this your favorite quote?",
+        //       "author_name": jsonData.quoteAuthor,
+        //       "author_link": jsonData.quoteLink,              
+        //       "title": "Quote",
+        //       "title_link": jsonData.quoteLink,
+        //       "text": jsonData.quoteText,              
+        //       "ts": 123456789
+        //     }
+        //   ]
+        // }
+    
         var responseMessage = {
+          "mrkdwn": true,
           "attachments": [
             {
               "fallback": jsonData.quoteText,
-              "color": "#36a64f",
-              "pretext": "Is this your favorite quote?",
-              "author_name": jsonData.quoteAuthor,
-              "author_link": jsonData.quoteLink,              
-              "title": "Quote",
-              "title_link": jsonData.quoteLink,
-              "text": jsonData.quoteText,              
-              "ts": 123456789
+              "color": "#2391ff",                            
+              "text": jsonData.quoteText,      
+              "author_name": "Author: " + jsonData.quoteAuthor,                                     
             }
           ]
         }
