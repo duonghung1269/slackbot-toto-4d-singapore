@@ -25,7 +25,8 @@ var bot = controller.spawn({
 
 var nextDrawNumber = 3299;
 // debug cronTime: '*/10 * * * * *' // every 10 seconds
-// cronTime: '*/5 30-40 18 * * 1,4',
+
+// define a cron job to broadcast live toto on every Monday and Thursday
 var totoBroadcastJob = new CronJob({
   cronTime: '*/5 30-40 18 * * 1,4',
   onTick: function() {
@@ -63,6 +64,12 @@ var totoBroadcastJob = new CronJob({
         if (numberOfDrawedNumbers == 1 && totoLiveStoredLength != numberOfDrawedNumbers) {
           var number = jsonData.numbers[0];
           totoLiveNumbers.push(number);
+          var welcomeMessage = `=======================================================\n`
+                              + `Yeah the Live Toto DrawNo *${jsonData.draw_id}* has just started!!!\n`
+                              + `There are *${jsonData.participant_count}* users watching the live! :smile:\n`
+                              + `Exciting! who will be the lucky winners today :money_with_wings: :kissing_heart: \n`
+                              + `=======================================================\n`;
+          bot.replyAndUpdate(cachedMessage, welcomeMessage);            
           bot.replyAndUpdate(cachedMessage, `The first draw number is: *${number}*`);            
           return;
         } else if (numberOfDrawedNumbers > 1 && numberOfDrawedNumbers < 6 && totoLiveStoredLength != numberOfDrawedNumbers) {
@@ -72,24 +79,29 @@ var totoBroadcastJob = new CronJob({
           return;
         } else if (numberOfDrawedNumbers == 7 && totoLiveStoredLength != numberOfDrawedNumbers) {
           var number = jsonData.numbers[numberOfDrawedNumbers - 1];
-          bot.replyAndUpdate(cachedMessage, `The *bonus* draw number is: *${jsonData.numbers[number]}*`);  
           totoLiveNumbers.push(number);
+          bot.replyAndUpdate(cachedMessage, `The *bonus* draw number is: \`${jsonData.numbers[number]}\``);  
+          bot.replyAndUpdate(cachedMessage, `Here is the Winning Numbers: \`${jsonData.numbers[number]}\``);            
+          bot.replyAndUpdate(cachedMessage, "Thanks for watching Toto live! See you on next Draw!");
+          bot.replyAndUpdate(cachedMessage, "=======================================================\n");
           return;
-        }
-        
-        bot.replyAndUpdate(cachedMessage, "Thanks for watching Toto live! See you on next Draw!");
+        }            
         
     });
   }, function () {
     /* This function is executed when the job stops */
-    // clear stored toto live numbers
+    // clear stored toto live numbers    
     totoLiveNumbers = [];
   },
   start: false,
   timeZone: 'Asia/Singapore'
 });
 
+// start cron job
 totoBroadcastJob.start();
+
+
+// ============= SLACK BOT EVENTS =================
 
 // listen message with format ex: toto 1234 1,2,3,4,5,6
 // syntax has 3 parts, separate by spaces
@@ -140,7 +152,8 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
 
 // Reply random Quote
 controller.hears(['[qQ]uote'],'direct_message,direct_mention',function(bot,message) {
-    bot.reply(message, "Finding your interesting quote...");
+  cachedMessage = message;  
+  bot.reply(message, "Finding your interesting quote...");
     
   quote.getRandomQuote().then(function(res) {
         var jsonData = res.body;
@@ -151,23 +164,8 @@ controller.hears(['[qQ]uote'],'direct_message,direct_mention',function(bot,messa
           return;
         }                      
       
-        cachedMessage = message;
-    
-        // var responseMessage = {
-        //   "attachments": [
-        //     {
-        //       "fallback": jsonData.quoteText,
-        //       "color": "#36a64f",
-        //       "pretext": "Is this your favorite quote?",
-        //       "author_name": jsonData.quoteAuthor,
-        //       "author_link": jsonData.quoteLink,              
-        //       "title": "Quote",
-        //       "title_link": jsonData.quoteLink,
-        //       "text": jsonData.quoteText,              
-        //       "ts": 123456789
-        //     }
-        //   ]
-        // }
+    // to format pretty message, refer slack bot message builder https://api.slack.com/docs/messages/builder
+                
     
         var responseMessage = {
           "mrkdwn": true,
@@ -187,6 +185,8 @@ controller.hears(['[qQ]uote'],'direct_message,direct_mention',function(bot,messa
 
 // Reply random giphy image
 controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot,message) {        
+  cachedMessage = message;
+  
   giphy.giphyRandom().then(function(res) {
         console.log('giphy ===', res.body)
         var jsonData = res.body;          
@@ -194,9 +194,7 @@ controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot
         if (res.statusCode != 200 || !jsonData || jsonData.meta.status != 200) {
           bot.replyAndUpdate(message, "Giphy Server is busy! Try again!!!")
           return;
-        }                      
-      
-        cachedMessage = message;
+        }                                  
     
         var responseMessage = {
           "attachments": [
