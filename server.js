@@ -1,13 +1,15 @@
 if (!process.env.token) {
-    console.log('Error: Specify token in environment');
+    console.log('Error: Missing Slackbot token in environment');
     process.exit(1);
 }
 
 var Botkit = require('botkit');
 var os = require('os');
-var singaporePools = require('./singapore-pools');
-var quote = require('./quote');
-var TotoModel = require('./totoModel');
+var singaporePools = require('./services/singapore-pools');
+var quote = require('./services/quote');
+var giphy = require('./services/giphy')
+var TotoModel = require('./models/totoModel');
+
 
 var controller = Botkit.slackbot({
     debug: true,
@@ -22,7 +24,7 @@ var bot = controller.spawn({
 // first part is keyword, should be toto (case insensitive)
 // second part is draw number, ex 1234
 // third part is 6 numbers to check, separate by command (,)
-controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct_message,direct_mention,ambient',function(bot,message) {
+controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct_message,direct_mention',function(bot,message) {
     var text = message.text;
     console.log('Text message===',text, message.channel);
     bot.replyAndUpdate(message,"Waiting to check TOTO result ... :kissing_closed_eyes:");  
@@ -64,7 +66,7 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
 });
 
 // Reply random Quote
-controller.hears(['quote'],'direct_message,direct_mention',function(bot,message) {
+controller.hears(['[qQ]uote'],'direct_message,direct_mention',function(bot,message) {
     bot.reply(message, "Finding your interesting quote...");
     
   quote.getRandomQuote().then(function(res) {
@@ -108,6 +110,37 @@ controller.hears(['quote'],'direct_message,direct_mention',function(bot,message)
     });
 });
 
-controller.hears(['help'],'direct_message,direct_mention',function(bot,message) {
-    bot.reply(message, "type your TOTO DrawNumber and numbers to check result, ex: toto 1234 1,2,3,4,5,6")
+// Reply random giphy image
+controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot,message) {        
+  giphy.giphyRandom().then(function(res) {
+        console.log('giphy ===', res.body)
+        var jsonData = res.body;          
+    
+        if (res.statusCode != 200 || !jsonData || jsonData.meta.status != 200) {
+          bot.replyAndUpdate(message, "Giphy Server is busy! Try again!!!")
+          return;
+        }                      
+      
+        var responseMessage = {
+          "attachments": [
+            {
+              "fallback": jsonData.data.image_original_url,
+              "color": "#2301ff",                
+              "image_url": jsonData.data.image_original_url,
+              "thumb_url": jsonData.data.fixed_width_small_url,
+              "footer": "Gif",
+              "footer_icon": jsonData.data.image_original_url,
+            }
+          ]
+        }            
+    
+        bot.replyAndUpdate(message, responseMessage);        
+    });
+});
+
+controller.hears(['^[hH]elp$'],'direct_message,direct_mention',function(bot,message) {
+    var services = "*Toto checking*\n  ex: toto 1234 1,2,3,4,5,6\n" +
+                   "*Quote*\n  ex: quote\n" +
+                   "*Gif*\n  ex: gif";
+    bot.reply(message, services)
 });
