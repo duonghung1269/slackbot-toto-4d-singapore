@@ -19,6 +19,8 @@
     "promise": "*",
     "pm2" : "*",
     "pm2-logrotate" : "*",
-    "cron" : "*"
+    "cron" : "*",
+    "moment" : "*",
+    "moment-timezone" : "*"
   }
 }

@@ -4,6 +4,7 @@ if (!process.env.token) {
 }
 
 var Botkit = require('botkit');
+var moment = require('moment');
 var os = require('os');
 var CronJob = require('cron').CronJob;
 var singaporePools = require('./services/singapore-pools');
@@ -14,6 +15,8 @@ var TotoModel = require('./models/totoModel');
 // this cachedMessage to use for job toto live to reply to slack channel
 var cachedMessage = undefined;
 var totoLiveNumbers = [];
+
+var SINGAPORE_TIMEZONE = 'Asia/Singapore';
 
 var controller = Botkit.slackbot({
     debug: true,
@@ -52,6 +55,13 @@ var totoBroadcastJob = new CronJob({
         if (nextDrawNumber != jsonData.next_draw_id) {
           nextDrawNumber = jsonData.next_draw_id;
         }                
+      
+        // reply comming live toto soon message
+        var now = moment().tz(SINGAPORE_TIMEZONE);
+        console.log(`====== HOUR: ${now.hour()} MINUTE: ${now.minutes()}, SECOND: ${now.seconds()}`);
+        if (now.hour() == 18 && now.minutes() == 30) {
+          bot.reply(cachedMessage, "Smart Bot will broadcast to you Live Toto shortly...");
+        }
         
         // live not started yet
         if (!jsonData.numbers || jsonData.status == 1) {
@@ -84,17 +94,19 @@ var totoBroadcastJob = new CronJob({
           bot.replyAndUpdate(cachedMessage, `Here is the Winning Numbers: \`${jsonData.numbers[number]}\``);            
           bot.replyAndUpdate(cachedMessage, "Thanks for watching Toto live! See you on next Draw!");
           bot.replyAndUpdate(cachedMessage, "=======================================================\n");
+          
+          // clear stored toto live numbers    
+          totoLiveNumbers = [];
           return;
         }            
         
     });
   }, function () {
     /* This function is executed when the job stops */
-    // clear stored toto live numbers    
-    totoLiveNumbers = [];
+    
   },
   start: false,
-  timeZone: 'Asia/Singapore'
+  timeZone: SINGAPORE_TIMEZONE
 });
 
 // start cron job
@@ -154,7 +166,7 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
 controller.hears(['[qQ]uote'],'direct_message,direct_mention',function(bot,message) {
   cachedMessage = message;  
   bot.reply(message, "Finding your interesting quote...");
-    
+  
   quote.getRandomQuote().then(function(res) {
         var jsonData = res.body;
         console.log('Quote ===', jsonData)  
