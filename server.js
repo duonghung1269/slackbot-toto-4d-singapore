@@ -62,7 +62,7 @@ var totoBroadcastJob = new CronJob({
         if (now.hour() == 18 && now.minutes() == 30 && now.seconds() == 10) {
           // clear stored toto live numbers    
           totoLiveNumbers = [];
-          bot.reply(cachedMessage, "Smart Bot will broadcast to you Live Toto shortly...");
+          bot.reply(cachedMessage, "TOTO Live will start soon! Stay tuned to watch it live now from Smart Bot...");
         }
         
         // live not started yet
