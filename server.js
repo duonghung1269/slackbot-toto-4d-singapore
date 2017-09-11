@@ -60,6 +60,8 @@ var totoBroadcastJob = new CronJob({
         var now = moment().tz(SINGAPORE_TIMEZONE);
         console.log(`====== HOUR: ${now.hour()} MINUTE: ${now.minutes()}, SECOND: ${now.seconds()}`);
         if (now.hour() == 18 && now.minutes() == 30 && now.seconds() == 10) {
+          // clear stored toto live numbers    
+          totoLiveNumbers = [];
           bot.reply(cachedMessage, "Smart Bot will broadcast to you Live Toto shortly...");
         }
         
@@ -91,13 +93,12 @@ var totoBroadcastJob = new CronJob({
         } else if (numberOfDrawedNumbers == 7 && totoLiveStoredLength < numberOfDrawedNumbers) {
           var number = jsonData.numbers[numberOfDrawedNumbers - 1];
           totoLiveNumbers.push(number);
-          bot.replyAndUpdate(cachedMessage, `The *bonus* draw number is: \`${number}\``);  
-          bot.replyAndUpdate(cachedMessage, `Here is the Winning Numbers: \`${jsonData.numbers.join(" ")}\``);            
-          bot.replyAndUpdate(cachedMessage, `Thanks for watching Toto live! See you on next Draw!`);
-          bot.replyAndUpdate(cachedMessage, `=======================================================\n`);
-          
-          // clear stored toto live numbers    
-          totoLiveNumbers = [];
+          var finalMessage = `The *bonus* draw number is: \`${number}\`\n`
+                            + `Here is the Winning Numbers: \`${jsonData.numbers.join(" ")}\`\n`
+                            + `Thanks for watching Toto live! See you on next Draw!`
+                            + `=======================================================\n`;
+          bot.replyAndUpdate(cachedMessage, finalMessage);            
+                    
           return;
         }            
         
