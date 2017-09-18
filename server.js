@@ -24,9 +24,36 @@ var controller = Botkit.slackbot({
 
 var bot = controller.spawn({
     token: process.env.token
-}).startRTM();
+}).startRTM(function (err, bot) {
+    if (err) {
+        throw new Error(err);
+    }
+
+    // @ https://api.slack.com/methods/users.list
+    bot.api.users.list({}, function (err, response) {
+        if (response.hasOwnProperty('members') && response.ok) {
+            var total = response.members.length;
+            for (var i = 0; i < total; i++) {
+                var member = response.members[i];
+                // console.log("MEMBERK: ", member); 
+            }
+        }
+    });
+
+    // @ https://api.slack.com/methods/channels.list
+    bot.api.channels.list({}, function (err, response) {
+        if (response.hasOwnProperty('channels') && response.ok) {
+            var total = response.channels.length;
+            for (var i = 0; i < total; i++) {
+                var channel = response.channels[i];
+                console.log("CHANNELK: ", channel)
+            }
+        }
+    });
+});
 
 var nextDrawNumber = 3299;
+var totoStarting = false;
 // debug cronTime: '*/10 * * * * *' // every 10 seconds
 
 // define a cron job to broadcast live toto on every Monday and Thursday
@@ -59,7 +86,8 @@ var totoBroadcastJob = new CronJob({
         // reply comming live toto soon message
         var now = moment().tz(SINGAPORE_TIMEZONE);
         console.log(`====== HOUR: ${now.hour()} MINUTE: ${now.minutes()}, SECOND: ${now.seconds()}`);
-        if (now.hour() == 18 && now.minutes() == 30 && now.seconds() == 10) {
+        var second = now.seconds();
+        if (now.hour() == 18 && now.minutes() == 30 && (second >= 19 || second <= 24)) {
           // clear stored toto live numbers    
           totoLiveNumbers = [];
           bot.reply(cachedMessage, "TOTO Live will start soon! Stay tuned to watch it live now from Smart Bot...");
@@ -74,7 +102,7 @@ var totoBroadcastJob = new CronJob({
         var numberOfDrawedNumbers = jsonData.numbers.length;
         var totoLiveStoredLength = totoLiveNumbers.length;
       
-        if (numberOfDrawedNumbers == 1 && totoLiveStoredLength < numberOfDrawedNumbers) {
+        if (numberOfDrawedNumbers == 1 && totoLiveStoredLength == 0) {
           var number = jsonData.numbers[0];
           totoLiveNumbers.push(number);
           var welcomeMessage = `=======================================================\n`
@@ -90,7 +118,7 @@ var totoBroadcastJob = new CronJob({
           totoLiveNumbers.push(number);
           bot.replyAndUpdate(cachedMessage, `The next draw number is: *${number}*`);            
           return;
-        } else if (numberOfDrawedNumbers == 7 && totoLiveStoredLength < numberOfDrawedNumbers) {
+        } else if (numberOfDrawedNumbers == 7 && totoLiveStoredLength == 6) {
           var number = jsonData.numbers[numberOfDrawedNumbers - 1];
           totoLiveNumbers.push(number);
           var finalMessage = `The *bonus* draw number is: \`${number}\`\n`
