@@ -87,7 +87,7 @@ var totoBroadcastJob = new CronJob({
         var now = moment().tz(SINGAPORE_TIMEZONE);
         console.log(`====== HOUR: ${now.hour()} MINUTE: ${now.minutes()}, SECOND: ${now.seconds()}`);
         var second = now.seconds();
-        if (now.hour() == 18 && now.minutes() == 30 && (second >= 19 || second <= 24)) {
+        if (now.hour() == 18 && now.minutes() == 30 && (second >= 19 && second <= 24)) {
           // clear stored toto live numbers    
           totoLiveNumbers = [];
           bot.reply(cachedMessage, "TOTO Live will start soon! Stay tuned to watch it live now from Smart Bot...");
@@ -113,7 +113,7 @@ var totoBroadcastJob = new CronJob({
                               + `The first draw number is: *${number}*\n`;
           bot.replyAndUpdate(cachedMessage, welcomeMessage);                      
           return;
-        } else if (numberOfDrawedNumbers > 1 && numberOfDrawedNumbers < 6 && totoLiveStoredLength < numberOfDrawedNumbers) {
+        } else if (numberOfDrawedNumbers > 1 && numberOfDrawedNumbers <= 6 && totoLiveStoredLength < numberOfDrawedNumbers) {
           var number = jsonData.numbers[numberOfDrawedNumbers - 1];
           totoLiveNumbers.push(number);
           bot.replyAndUpdate(cachedMessage, `The next draw number is: *${number}*`);            
