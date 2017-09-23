@@ -123,7 +123,7 @@ var totoBroadcastJob = new CronJob({
           totoLiveNumbers.push(number);
           var finalMessage = `The *bonus* draw number is: \`${number}\`\n`
                             + `Here is the Winning Numbers: \`${jsonData.numbers.join(" ")}\`\n`
-                            + `Thanks for watching Toto live! See you on next Draw!`
+                            + `Thanks for watching Toto live! See you on next Draw!\n`
                             + `=======================================================\n`;
           bot.replyAndUpdate(cachedMessage, finalMessage);            
                     
