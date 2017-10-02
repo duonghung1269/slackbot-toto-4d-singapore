@@ -111,7 +111,7 @@ var totoBroadcastJob = new CronJob({
                               + `Exciting! who will be the lucky winners today :money_with_wings: :kissing_heart: \n`
                               + `=======================================================\n\n`
                               + `The first draw number is: *${number}*\n`;
-          bot.replyAndUpdate(cachedMessage, welcomeMessage);                      
+         bot.replyAndUpdate(cachedMessage, welcomeMessage);                      
           return;
         } else if (numberOfDrawedNumbers > 1 && numberOfDrawedNumbers <= 6 && totoLiveStoredLength < numberOfDrawedNumbers) {
           var number = jsonData.numbers[numberOfDrawedNumbers - 1];
@@ -263,3 +263,12 @@ controller.hears(['^[hH]elp$'],'direct_message,direct_mention',function(bot,mess
                    "*Gif*\n  ex: gif";
     bot.reply(message, services)    
 });
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
