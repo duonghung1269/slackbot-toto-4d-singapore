@@ -106,7 +106,7 @@ var totoBroadcastJob = new CronJob({
           var number = jsonData.numbers[0];
           totoLiveNumbers.push(number);
           var welcomeMessage = `=======================================================\n`
-                              + `Yeah the Live Toto DrawNo *${jsonData.draw_id}* has just started!!!\n`
+                              + `Live Toto Draw No. *${jsonData.draw_id}* has just started!!!\n`
                               + `There are *${jsonData.participant_count}* users watching the live! :smile:\n`
                               + `Exciting! who will be the lucky winners today :money_with_wings: :kissing_heart: \n`
                               + `=======================================================\n\n`
