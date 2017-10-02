@@ -13,7 +13,6 @@ function getTotoFromServer(totoRequestModel) {
         body: totoRequestModel,
         json: true
       },function(err, res, body) {
-          console.log(res.statusCode)  
           console.log(res.body);
           resolve(res);
         });
@@ -32,7 +31,6 @@ function getNextDrawNumber(drawId) {
                  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36'},
         json: true
       },function(err, res, body) {
-          console.log(res.statusCode)  
           console.log(res.body);
           resolve(res);
         });
