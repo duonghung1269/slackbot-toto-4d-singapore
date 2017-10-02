@@ -170,8 +170,6 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
           bot.replyAndUpdate(message, "Server is busy! Try again!!!")
           return;
         }
-        
-        console.log("2. Message obj", message)
       
         var data = res.body;
         var jsonData = JSON.parse(data.d);
@@ -181,7 +179,7 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
       
         if (totoReponse.prizes.length == 0) {
           bot.replyAndUpdate(message, `You're bad luck!! Try another numbers! :sob: \n${totoReponse.displayWinningNumbers()}`);
-          console.log("3. Message obj", message)
+          
           return;
         }
       
