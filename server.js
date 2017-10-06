@@ -266,7 +266,7 @@ controller.hears(['^[bB][aA][bB][yY]$'],'direct_message,direct_mention',function
         console.log('getty images ===', gettyImageModel)              
 
       if (!gettyImageModel.id) {
-          bot.reply(message, "ERROR: " + err);
+          bot.reply(message, "ERROR: " + gettyImageModel);
           return;
       }
         bot.reply(message, "DEBUG: " + gettyImageModel.getThumbImage());
