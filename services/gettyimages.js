@@ -18,6 +18,9 @@ function getRandomBabyImage() {
   console.log("TotalPage = ", totalPages);
   console.log("randomPageNumber = ", randomPageNumber);
   
+  // ['0-1_months', '2-5_months', '6-11_months', '12-17_months', '18-23_months', '2-3_years'],
+  
+  
   //var url = `https://api.gettyimages.com/v3/search/images?phrase=baby&page_size=${pageSize}&page=${randomPageNumber}&minimum_size=large&age_of_people=newborn&fields=detail_set&sort_order=most_popular`;
   var url = `https://api.gettyimages.com/v3/search/images`;
   console.log("GETTY URL == ", url);
@@ -31,7 +34,7 @@ function getRandomBabyImage() {
           'phrase': 'baby',
           'page_size': pageSize,
           'page': randomPageNumber,
-          'age_of_people': ['0-1_months', '2-5_months', '6-11_months', '12-17_months', '18-23_months', '2-3_years'],
+          'age_of_people': '0-1_months,2-5_months,6-11_months,12-17_months,18-23_months,2-3_years',
           'fields' : 'detail_set',          
         },
         json: true
