@@ -230,12 +230,14 @@ controller.hears(['[qQ]uote'],'direct_message,direct_mention',function(bot,messa
 controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot,message) {        
   cachedMessage = message;
   
+  bot.reply(message, "Lemme find cutest baby for you ^_^ ");
+  
   giphy.giphyRandom().then(function(res) {
         console.log('giphy ===', res.body)
         var jsonData = res.body;          
     
         if (res.statusCode != 200 || !jsonData || jsonData.meta.status != 200) {
-          bot.replyAndUpdate(message, "Giphy Server is busy! Try again!!!")
+          bot.reply(message, "Giphy Server is busy! Try again!!!")
           return;
         }                                  
     

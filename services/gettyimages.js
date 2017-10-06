@@ -8,15 +8,18 @@ var babyImagesResult = {
 function getRandomBabyImage() {
     console.log("Get RandomBabyImage...");
   
-  var pageSize = 10;
+  var pageSize = 100;
+  console.log("babyImagesResult.result_count = ", babyImagesResult.result_count);
+  // A page number greater than 100 is not allowed for anonymous users.
+  var maxPageNumer = 100;
   var totalPages =  Math.ceil(babyImagesResult.result_count == -1 ? 1 : babyImagesResult.result_count / pageSize);
-  var randomPageNumber =  Math.ceil(totalPages * Math.random());  
+  var randomPageNumber =  Math.ceil((totalPages % maxPageNumer) * Math.random());  
   
   console.log("TotalPage = ", totalPages);
   console.log("randomPageNumber = ", randomPageNumber);
   
   var url = `https://api.gettyimages.com/v3/search/images?phrase=baby&page_size=${pageSize}&page=${randomPageNumber}&minimum_size=large&age_of_people=baby&fields=detail_set&sort_order=most_popular`;
-  
+  console.log("GETTY URL == ", url);
     return new Promise(function(resolve) { 
       request({
         url: url,
@@ -29,7 +32,7 @@ function getRandomBabyImage() {
           //console.log(res.body);
           
           if (res.statusCode == 200 && res.body) {
-            babyImagesResult.result_count = res.body.result_count;
+            babyImagesResult.result_count = Number(res.body.result_count);
             console.log("TOTOAL RESULT COUNT = ", res.body.result_count);
           }
         
