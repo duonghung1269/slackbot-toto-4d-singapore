@@ -256,7 +256,7 @@ controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot
     });
 });
 
-// Reply random giphy image
+// Reply random baby image
 controller.hears(['^[bB][aA][bB][yY]$'],'direct_message,direct_mention',function(bot,message) {        
   cachedMessage = message;
   
