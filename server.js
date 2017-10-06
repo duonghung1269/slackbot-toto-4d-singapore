@@ -228,9 +228,7 @@ controller.hears(['[qQ]uote'],'direct_message,direct_mention',function(bot,messa
 
 // Reply random giphy image
 controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot,message) {        
-  cachedMessage = message;
-  
-  bot.reply(message, "Lemme find cutest baby for you ^_^ ");
+  cachedMessage = message;  
   
   giphy.giphyRandom().then(function(res) {
         console.log('giphy ===', res.body)
@@ -261,6 +259,8 @@ controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot
 // Reply random giphy image
 controller.hears(['^[bB][aA][bB][yY]$'],'direct_message,direct_mention',function(bot,message) {        
   cachedMessage = message;
+  
+  bot.reply(message, "Lemme find cutest baby for you ^_^ ");
   
   gettyImages.getRandomBabyImage().then(function(gettyImageModel) {
         console.log('getty images ===', gettyImageModel)              
