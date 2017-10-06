@@ -18,7 +18,8 @@ function getRandomBabyImage() {
   console.log("TotalPage = ", totalPages);
   console.log("randomPageNumber = ", randomPageNumber);
   
-  var url = `https://api.gettyimages.com/v3/search/images?phrase=baby&page_size=${pageSize}&page=${randomPageNumber}&minimum_size=large&age_of_people=newborn&fields=detail_set&sort_order=most_popular`;
+  //var url = `https://api.gettyimages.com/v3/search/images?phrase=baby&page_size=${pageSize}&page=${randomPageNumber}&minimum_size=large&age_of_people=newborn&fields=detail_set&sort_order=most_popular`;
+  var url = `https://api.gettyimages.com/v3/search/images`;
   console.log("GETTY URL == ", url);
     return new Promise(function(resolve) { 
       request({
@@ -26,6 +27,13 @@ function getRandomBabyImage() {
         method: "GET",
         headers: { 'Api-Key' : process.env.GETTY_IMAGES_KEY,
                  'Accept': 'application/json, text/javascript, */*; q=0.01'},
+        qs: {
+          'phrase': 'baby',
+          'page_size': pageSize,
+          'page': randomPageNumber,
+          'age_of_people': ['0-1_months', '2-5_months', '6-11_months', '12-17_months', '18-23_months', '2-3_years'],
+          'fields' : 'detail_set',          
+        },
         json: true
       },function(err, res, body) {
           console.log(res.statusCode)  
