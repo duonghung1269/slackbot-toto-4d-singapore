@@ -39,6 +39,11 @@ function getRandomBabyImage() {
           console.log(res.statusCode)  
           //console.log(res.body);
           
+          if (err || res.statusCode != 200) {
+            resolve(err);
+            return;
+          }
+        
           if (res.statusCode == 200 && res.body) {
             babyImagesResult.result_count = Number(res.body.result_count);
             console.log("TOTOAL RESULT COUNT = ", res.body.result_count);
