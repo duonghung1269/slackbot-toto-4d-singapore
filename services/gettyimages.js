@@ -39,6 +39,9 @@ function getRandomBabyImage() {
           console.log(res.statusCode)  
           //console.log(res.body);
           
+          console.log("ERROR: ", err);
+          console.log("STATUS CODE", res.statusCode);
+        
           if (err || res.statusCode != 200) {
             resolve(err);
             return;
