@@ -264,8 +264,14 @@ controller.hears(['^[bB][aA][bB][yY]$'],'direct_message,direct_mention',function
   
   gettyImages.getRandomBabyImage().then(function(gettyImageModel) {
         console.log('getty images ===', gettyImageModel)              
-    
+
+      if (!gettyImageModel.id) {
+          bot.reply(message, "ERROR: " + err);
+          return;
+      }
         bot.reply(message, "DEBUG: " + gettyImageModel.getThumbImage());
+        
+
       
         if (!gettyImageModel) {
           bot.reply(message, "Image Server is busy! Try again!!!")
