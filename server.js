@@ -10,6 +10,7 @@ var CronJob = require('cron').CronJob;
 var singaporePools = require('./services/singapore-pools');
 var quote = require('./services/quote');
 var giphy = require('./services/giphy')
+var gettyImages = require('./services/gettyimages')
 var TotoModel = require('./models/totoModel');
 
 // this cachedMessage to use for job toto live to reply to slack channel
@@ -106,12 +107,12 @@ var totoBroadcastJob = new CronJob({
           var number = jsonData.numbers[0];
           totoLiveNumbers.push(number);
           var welcomeMessage = `=======================================================\n`
-                              + `Live Toto Draw No. *${jsonData.draw_id}* has just started!!!\n`
+                              + `Yeah the Live Toto DrawNo *${jsonData.draw_id}* has just started!!!\n`
                               + `There are *${jsonData.participant_count}* users watching the live! :smile:\n`
                               + `Exciting! who will be the lucky winners today :money_with_wings: :kissing_heart: \n`
                               + `=======================================================\n\n`
                               + `The first draw number is: *${number}*\n`;
-         bot.replyAndUpdate(cachedMessage, welcomeMessage);                      
+          bot.replyAndUpdate(cachedMessage, welcomeMessage);                      
           return;
         } else if (numberOfDrawedNumbers > 1 && numberOfDrawedNumbers <= 6 && totoLiveStoredLength < numberOfDrawedNumbers) {
           var number = jsonData.numbers[numberOfDrawedNumbers - 1];
@@ -170,6 +171,8 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
           bot.replyAndUpdate(message, "Server is busy! Try again!!!")
           return;
         }
+        
+        console.log("2. Message obj", message)
       
         var data = res.body;
         var jsonData = JSON.parse(data.d);
@@ -179,7 +182,7 @@ controller.hears(['^[tT][oO][tT][oO] [0-9]{4} (\\d{1,2})+(,\\d{1,2})*$'],'direct
       
         if (totoReponse.prizes.length == 0) {
           bot.replyAndUpdate(message, `You're bad luck!! Try another numbers! :sob: \n${totoReponse.displayWinningNumbers()}`);
-          
+          console.log("3. Message obj", message)
           return;
         }
       
@@ -253,6 +256,35 @@ controller.hears(['^[gG][iI][fF]$'],'direct_message,direct_mention',function(bot
     });
 });
 
+// Reply random giphy image
+controller.hears(['^[bB][aA][bB][yY]$'],'direct_message,direct_mention',function(bot,message) {        
+  cachedMessage = message;
+  
+  gettyImages.getRandomBabyImage().then(function(gettyImageModel) {
+        console.log('getty images ===', gettyImageModel)              
+    
+        if (!gettyImageModel) {
+          bot.replyAndUpdate(message, "Image Server is busy! Try again!!!")
+          return;
+        }                                  
+    
+        var responseMessage = {
+          "attachments": [
+            {
+              "fallback": gettyImageModel.getThumbImage(),
+              "color": "#2301ff",                
+              "image_url": gettyImageModel.getPreviewImage(),
+              "thumb_url": gettyImageModel.getThumbImage(),
+              "footer": gettyImageModel.caption,
+              "footer_icon": gettyImageModel.getThumbImage(),
+            }
+          ]
+        }            
+    
+        bot.replyAndUpdate(message, responseMessage);        
+    });
+});
+
 controller.hears(['^[hH]elp$'],'direct_message,direct_mention',function(bot,message) {
   cachedMessage = message;  
   
@@ -261,12 +293,3 @@ controller.hears(['^[hH]elp$'],'direct_message,direct_mention',function(bot,mess
                    "*Gif*\n  ex: gif";
     bot.reply(message, services)    
 });
-
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}
