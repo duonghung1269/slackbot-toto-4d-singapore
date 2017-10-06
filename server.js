@@ -265,8 +265,10 @@ controller.hears(['^[bB][aA][bB][yY]$'],'direct_message,direct_mention',function
   gettyImages.getRandomBabyImage().then(function(gettyImageModel) {
         console.log('getty images ===', gettyImageModel)              
     
+        bot.reply(message, "DEBUG: " + gettyImageModel.getThumbImage());
+      
         if (!gettyImageModel) {
-          bot.replyAndUpdate(message, "Image Server is busy! Try again!!!")
+          bot.reply(message, "Image Server is busy! Try again!!!")
           return;
         }                                  
     
@@ -283,7 +285,7 @@ controller.hears(['^[bB][aA][bB][yY]$'],'direct_message,direct_mention',function
           ]
         }            
     
-        bot.replyAndUpdate(message, responseMessage);        
+        bot.reply(message, responseMessage);        
     });
 });
 
