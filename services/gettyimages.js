@@ -18,7 +18,7 @@ function getRandomBabyImage() {
   console.log("TotalPage = ", totalPages);
   console.log("randomPageNumber = ", randomPageNumber);
   
-  var url = `https://api.gettyimages.com/v3/search/images?phrase=baby&page_size=${pageSize}&page=${randomPageNumber}&minimum_size=large&age_of_people=baby&fields=detail_set&sort_order=most_popular`;
+  var url = `https://api.gettyimages.com/v3/search/images?phrase=baby&page_size=${pageSize}&page=${randomPageNumber}&minimum_size=large&age_of_people=newborn&fields=detail_set&sort_order=most_popular`;
   console.log("GETTY URL == ", url);
     return new Promise(function(resolve) { 
       request({
