@@ -9,9 +9,12 @@ var os = require('os');
 var CronJob = require('cron').CronJob;
 var singaporePools = require('./services/singapore-pools');
 var quote = require('./services/quote');
-var giphy = require('./services/giphy')
-var gettyImages = require('./services/gettyimages')
+var giphy = require('./services/giphy');
+var gettyImages = require('./services/gettyimages');
+var facebookPhotos = require('./services/facebook-photos');
 var TotoModel = require('./models/totoModel');
+
+let facebookToken = '619456688258561|2C1gUON8OWKpSpxmsWPZBRQZ_pc'; //process.env.FACEBOOK_TOKEN;
 
 // this cachedMessage to use for job toto live to reply to slack channel
 var cachedMessage = undefined;
@@ -286,6 +289,22 @@ controller.hears(['^[bB][aA][bB][yY]$'],'direct_message,direct_mention',function
         bot.reply(message, responseMessage);        
     });
 });
+
+// Facebook random sexy photo
+controller.hears(
+    ['boob', 'boobs', 'vếu', 'girl', 'girls', 'gái'], ['direct_message', 'direct_mention', 'mention'],
+    function(bot, message) {
+        bot.reply(message, 'Chờ xíu, đang tìm vếu...');
+        let isSexy = true;
+        let pageId = facebookPhotos.getPageId(true);
+        facebookPhotos.getRandomImage(facebookToken, pageId, 1, 500)
+            .then(result => {
+                let imageUrl = result[0];
+                //bot.reply(message, imageUrl);
+                bot.reply(message, { attachments: [ { text:'Vếu nè anh iu <3', image_url: imageUrl }] });
+            });
+    }
+);
 
 controller.hears(['^[hH]elp$'],'direct_message,direct_mention',function(bot,message) {
   cachedMessage = message;  
